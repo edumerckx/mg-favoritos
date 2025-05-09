@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "mg-favoritos"
+version = "0.1.0"
+description = ""
+authors = ["Eduardo Gomes <edu_merckx@yahoo.com.br>"]
+readme = "README.md"
+packages = [{include = "mg_favoritos"}]
+
+[tool.poetry.dependencies]
+python = "3.12.5"
+fastapi = {extras = ["standard"], version = "^0.115.12"}
+alembic = "^1.15.2"
+sqlalchemy = "^2.0.40"
+pydantic-settings = "^2.9.1"
+pyjwt = "^2.10.1"
+psycopg = {extras = ["binary"], version = "^3.2.7"}
+
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.14.1"
+ruff = "^0.11.8"
+pytest = "^8.3.5"
+pytest-cov = "^6.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 80
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.pytest.ini_options]
+pythonpath = '.'
+addopts = '-p no:warnings'
+
+[tool.taskipy.tasks]
+lint = 'ruff check .; ruff check . --diff'
+format = 'ruff check . --fix; ruff format .'
+dev = 'fastapi dev mg_favoritos/app.py'
+pre_test = 'task format'
+test = 'pytest -s -x --cov=mg_favoritos -vv'
+post_test = 'coverage html'
+
