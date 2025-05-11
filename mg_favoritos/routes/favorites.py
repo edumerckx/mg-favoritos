@@ -6,21 +6,23 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as SessionORM
 
 from mg_favoritos.database import get_session
-from mg_favoritos.models import Client, Favorite
+from mg_favoritos.models import Customer, Favorite
 from mg_favoritos.schemas.favorites import FavoriteList, FavoriteResponse
-from mg_favoritos.security import get_client
+from mg_favoritos.security import get_customer
 from mg_favoritos.services.products import get_product, get_products
 
 router = APIRouter(prefix='/favorites', tags=['favorites'])
 Session = Annotated[SessionORM, Depends(get_session)]
-CurrentClient = Annotated[Client, Depends(get_client)]
+CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=FavoriteList)
-async def get_favorites(session: Session, current_client: CurrentClient):
+async def get_favorites(session: Session, current_customer: CurrentCustomer):
     favorites = session.scalars(
-        select(Favorite).where(Favorite.client_id == current_client.id)
+        select(Favorite).where(Favorite.customer_id == current_customer.id)
     ).all()
+
+    products = []
 
     if len(favorites) > 0:
         products = await get_products(favorites)
@@ -36,7 +38,7 @@ async def get_favorites(session: Session, current_client: CurrentClient):
 async def create_favorite(
     product_id: int,
     session: Session,
-    current_client: CurrentClient,
+    current_customer: CurrentCustomer,
 ):
     product_exists = await get_product(product_id)
     if not product_exists:
@@ -46,7 +48,7 @@ async def create_favorite(
 
     db_favorite = session.scalar(
         select(Favorite).where(
-            Favorite.client_id == current_client.id,
+            Favorite.customer_id == current_customer.id,
             Favorite.product_id == product_id,
         )
     )
@@ -56,7 +58,7 @@ async def create_favorite(
         )
 
     favorite = Favorite(
-        client_id=current_client.id,
+        customer_id=current_customer.id,
         product_id=product_id,
     )
     session.add(favorite)

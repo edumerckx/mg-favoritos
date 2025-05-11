@@ -11,7 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as SessionORM
 
 from mg_favoritos.database import get_session
-from mg_favoritos.models import Client
+from mg_favoritos.models import Customer
 from mg_favoritos.settings import Settings
 
 pwd_context = PasswordHash.recommended()
@@ -39,7 +39,7 @@ def create_token(data):
     return encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def get_client(token: OAuth2Scheme, session: Session):
+def get_customer(token: OAuth2Scheme, session: Session):
     try:
         payload = decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -54,11 +54,11 @@ def get_client(token: OAuth2Scheme, session: Session):
             status_code=HTTPStatus.UNAUTHORIZED, detail='Token expired'
         )
 
-    client = session.scalar(select(Client).where(Client.email == email))
-    if not client:
+    customer = session.scalar(select(Customer).where(Customer.email == email))
+    if not customer:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail='Unable to validate credentials',
         )
 
-    return client
+    return customer

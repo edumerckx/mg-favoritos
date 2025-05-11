@@ -4,7 +4,7 @@ from mg_favoritos.schemas.products import ProductResponse
 
 
 class FavoriteSchema(BaseModel):
-    client_id: int
+    customer_id: int
     product_id: int
 
 

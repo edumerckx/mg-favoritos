@@ -7,11 +7,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as SessionORM
 
 from mg_favoritos.database import get_session
-from mg_favoritos.models import Client
+from mg_favoritos.models import Customer
 from mg_favoritos.schemas.auth import Token
 from mg_favoritos.security import (
     create_token,
-    get_client,
+    get_customer,
     verify,
 )
 
@@ -23,26 +23,26 @@ OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 @router.post('/token', response_model=Token, status_code=HTTPStatus.CREATED)
 def login_for_access_token(form_data: OAuth2Form, session: Session):
-    client = session.scalar(
-        select(Client).where(Client.email == form_data.username)
+    customer = session.scalar(
+        select(Customer).where(Customer.email == form_data.username)
     )
 
     bad_request = HTTPException(
         status_code=HTTPStatus.BAD_REQUEST, detail='Invalid credentials'
     )
 
-    if not client:
+    if not customer:
         raise bad_request
 
-    if not verify(form_data.password, client.password):
+    if not verify(form_data.password, customer.password):
         raise bad_request
 
-    access_token = create_token(data={'sub': client.email})
+    access_token = create_token(data={'sub': customer.email})
 
     return {'access_token': access_token, 'token_type': 'bearer'}
 
 
 @router.post('/refresh_token', response_model=Token, status_code=HTTPStatus.OK)
-def refresh_access_token(client: Client = Depends(get_client)):
-    access_token = create_token(data={'sub': client.email})
+def refresh_access_token(customer: Customer = Depends(get_customer)):
+    access_token = create_token(data={'sub': customer.email})
     return {'access_token': access_token, 'token_type': 'bearer'}

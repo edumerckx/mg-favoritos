@@ -7,67 +7,69 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session as SessionORM
 
 from mg_favoritos.database import get_session
-from mg_favoritos.models import Client
-from mg_favoritos.schemas.client import ClientResponse, ClientSchema
-from mg_favoritos.security import get_client, get_hash
+from mg_favoritos.models import Customer
+from mg_favoritos.schemas.customer import CustomerResponse, CustomerSchema
+from mg_favoritos.security import get_customer, get_hash
 
-router = APIRouter(tags=['clients'], prefix='/clients')
+router = APIRouter(tags=['customers'], prefix='/customers')
 
 Session = Annotated[SessionORM, Depends(get_session)]
-CurrentClient = Annotated[Client, Depends(get_client)]
+CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 
-@router.post('/', status_code=HTTPStatus.CREATED, response_model=ClientResponse)
-def create_client(client: ClientSchema, session: Session):
-    new_client = Client(
-        name=client.name,
-        email=client.email,
-        password=get_hash(client.password),
+@router.post(
+    '/', status_code=HTTPStatus.CREATED, response_model=CustomerResponse
+)
+def create_customer(customer: CustomerSchema, session: Session):
+    new_customer = Customer(
+        name=customer.name,
+        email=customer.email,
+        password=get_hash(customer.password),
     )
 
     try:
-        session.add(new_client)
+        session.add(new_customer)
         session.commit()
-        session.refresh(new_client)
-        return new_client
+        session.refresh(new_customer)
+        return new_customer
     except Exception as e:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=str(e))
 
 
-@router.get('/{id}', status_code=HTTPStatus.OK, response_model=ClientResponse)
-def get_client(id: int, session: Session, current_client: CurrentClient):
-    if current_client.id != id:
+@router.get('/{id}', status_code=HTTPStatus.OK, response_model=CustomerResponse)
+def get_customer(id: int, session: Session, current_customer: CurrentCustomer):
+    if current_customer.id != id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
-    client = session.scalar(select(Client).where(Client.id == id))
-    if not client:
+    customer = session.scalar(select(Customer).where(Customer.id == id))
+    if not customer:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='Client not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='Customer not found'
         )
-    return client
+    return customer
 
 
-@router.put('/{id}', status_code=HTTPStatus.OK, response_model=ClientResponse)
-def update_client(
+@router.put('/{id}', status_code=HTTPStatus.OK, response_model=CustomerResponse)
+def update_customer(
     id: int,
-    client: ClientSchema,
+    customer: CustomerSchema,
     session: Session,
-    current_client: CurrentClient,
+    current_customer: CurrentCustomer,
 ):
-    if current_client.id != id:
+    if current_customer.id != id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
     try:
-        current_client.name = client.name
-        current_client.email = client.email
-        current_client.password = get_hash(client.password)
+        current_customer.name = customer.name
+        current_customer.email = customer.email
+        current_customer.password = get_hash(customer.password)
 
         session.commit()
-        session.refresh(current_client)
-        return current_client
+        session.refresh(current_customer)
+        return current_customer
     except IntegrityError:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST, detail='Email already exists'
@@ -75,11 +77,13 @@ def update_client(
 
 
 @router.delete('/{id}', status_code=HTTPStatus.NO_CONTENT)
-def delete_client(id: int, session: Session, current_client: CurrentClient):
-    if current_client.id != id:
+def delete_customer(
+    id: int, session: Session, current_customer: CurrentCustomer
+):
+    if current_customer.id != id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    session.delete(current_client)
+    session.delete(current_customer)
     session.commit()

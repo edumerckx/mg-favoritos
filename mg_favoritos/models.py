@@ -7,8 +7,8 @@ table_registry = registry()
 
 
 @table_registry.mapped_as_dataclass
-class Client:
-    __tablename__ = 'clients'
+class Customer:
+    __tablename__ = 'customers'
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
@@ -20,7 +20,7 @@ class Client:
         init=False, server_default=func.now(), onupdate=func.now()
     )
     favorites: Mapped[list['Favorite']] = relationship(
-        init=False, back_populates='client', cascade='all, delete-orphan'
+        init=False, back_populates='customer', cascade='all, delete-orphan'
     )
 
 
@@ -28,11 +28,11 @@ class Client:
 class Favorite:
     __tablename__ = 'favorites'
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'))
+    customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'))
     product_id: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
-    client: Mapped[Client] = relationship(
+    customer: Mapped[Customer] = relationship(
         init=False, back_populates='favorites'
     )
