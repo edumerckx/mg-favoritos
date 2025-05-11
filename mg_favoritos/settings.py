@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     SECRET_KEY: str
     ALGORITHM: str
+    PRODUCTS_ENDPOINT: str
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',
