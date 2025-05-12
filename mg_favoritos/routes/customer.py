@@ -19,7 +19,7 @@ CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 @router.post(
     '/', status_code=HTTPStatus.CREATED, response_model=CustomerResponse
 )
-def create_customer(customer: CustomerSchema, session: Session):
+async def create_customer(customer: CustomerSchema, session: Session):
     """
     Cria um novo cliente
 
@@ -33,8 +33,8 @@ def create_customer(customer: CustomerSchema, session: Session):
 
     try:
         session.add(new_customer)
-        session.commit()
-        session.refresh(new_customer)
+        await session.commit()
+        await session.refresh(new_customer)
         return new_customer
     except IntegrityError:
         raise HTTPException(
@@ -44,7 +44,7 @@ def create_customer(customer: CustomerSchema, session: Session):
 
 
 @router.get('/{id}', status_code=HTTPStatus.OK, response_model=CustomerResponse)
-def get_customer(id: int, current_customer: CurrentCustomer):
+async def get_customer(id: int, current_customer: CurrentCustomer):
     """
     Busca um cliente pelo ID
 
@@ -57,7 +57,7 @@ def get_customer(id: int, current_customer: CurrentCustomer):
 
 
 @router.put('/{id}', status_code=HTTPStatus.OK, response_model=CustomerResponse)
-def update_customer(
+async def update_customer(
     id: int,
     customer: CustomerSchema,
     session: Session,
@@ -76,8 +76,8 @@ def update_customer(
         current_customer.email = customer.email
         current_customer.password = get_hash(customer.password)
 
-        session.commit()
-        session.refresh(current_customer)
+        await session.commit()
+        await session.refresh(current_customer)
         return current_customer
     except IntegrityError:
         raise HTTPException(
@@ -86,7 +86,7 @@ def update_customer(
 
 
 @router.delete('/{id}', status_code=HTTPStatus.NO_CONTENT)
-def delete_customer(
+async def delete_customer(
     id: int, session: Session, current_customer: CurrentCustomer
 ):
     """
@@ -95,5 +95,5 @@ def delete_customer(
     - `id`: int - id do cliente"""
     check_permissions(current_customer, id)
 
-    session.delete(current_customer)
-    session.commit()
+    await session.delete(current_customer)
+    await session.commit()

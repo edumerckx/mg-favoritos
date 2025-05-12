@@ -9,10 +9,11 @@ async def get_products(favorites: list[Favorite]) -> list[ProductResponse]:
     async with AsyncClient() as client:
         products = []
         for favorite in favorites:
-            response = await client.get(
-                f'{Settings().PRODUCTS_ENDPOINT}/{favorite.product_id}'
-            )
             try:
+                response = await client.get(
+                    f'{Settings().PRODUCTS_ENDPOINT}/{favorite.product_id}'
+                )
+
                 data = response.json()
                 if data:
                     favorite_response = ProductResponse(
@@ -31,11 +32,11 @@ async def get_products(favorites: list[Favorite]) -> list[ProductResponse]:
 
 async def get_product(product_id: int) -> bool:
     async with AsyncClient() as client:
-        response = await client.get(
-            f'{Settings().PRODUCTS_ENDPOINT}/{product_id}'
-        )
-
         try:
+            response = await client.get(
+                f'{Settings().PRODUCTS_ENDPOINT}/{product_id}'
+            )
+
             data = response.json()
             if data:
                 return True

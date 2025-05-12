@@ -23,14 +23,14 @@ CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 
 @router.post('/token', response_model=Token, status_code=HTTPStatus.CREATED)
-def login_for_access_token(form_data: OAuth2Form, session: Session):
+async def login_for_access_token(form_data: OAuth2Form, session: Session):
     """
     Efetua o login do usuário e retorna um token de acesso para requests futuros
 
     - `username`: email do usuário
     - `password`: senha
     """
-    customer = session.scalar(
+    customer = await session.scalar(
         select(Customer).where(Customer.email == form_data.username)
     )
 

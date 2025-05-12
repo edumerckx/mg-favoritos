@@ -25,9 +25,10 @@ async def get_favorites(session: Session, current_customer: CurrentCustomer):
     """
     Busca os favoritos do usuário logado
     """
-    favorites = session.scalars(
+    favorites = await session.scalars(
         select(Favorite).where(Favorite.customer_id == current_customer.id)
-    ).all()
+    )
+    favorites = favorites.all()
 
     products = []
 
@@ -52,7 +53,7 @@ async def create_favorite(
 
     - `favorite`: FavoriteSchema
     """
-    db_favorite = session.scalar(
+    db_favorite = await session.scalar(
         select(Favorite).where(
             Favorite.customer_id == current_customer.id,
             Favorite.product_id == favorite.product_id,
@@ -73,21 +74,21 @@ async def create_favorite(
         product_id=favorite.product_id,
     )
     session.add(favorite)
-    session.commit()
-    session.refresh(favorite)
+    await session.commit()
+    await session.refresh(favorite)
     return favorite
 
 
 @router.delete('/{id}', status_code=HTTPStatus.NO_CONTENT)
-def delete_favorite(
+async def delete_favorite(
     id: int, session: Session, current_customer: CurrentCustomer
 ):
     """
     Deleta um favorito pelo ID
 
-    - `id`: int - id do favorito
+    - `id`: int - id do produto favoritado
     """
-    db_favorite = session.scalar(
+    db_favorite = await session.scalar(
         select(Favorite).where(
             Favorite.customer_id == current_customer.id,
             Favorite.product_id == id,
@@ -98,5 +99,5 @@ def delete_favorite(
             status_code=HTTPStatus.NOT_FOUND, detail='Favorite not found'
         )
 
-    session.delete(db_favorite)
-    session.commit()
+    await session.delete(db_favorite)
+    await session.commit()

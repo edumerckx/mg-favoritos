@@ -39,7 +39,7 @@ def create_token(data):
     return encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
-def get_customer(token: OAuth2Scheme, session: Session):
+async def get_customer(token: OAuth2Scheme, session: Session):
     try:
         payload = decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -54,7 +54,9 @@ def get_customer(token: OAuth2Scheme, session: Session):
             status_code=HTTPStatus.UNAUTHORIZED, detail='Token expired'
         )
 
-    customer = session.scalar(select(Customer).where(Customer.email == email))
+    customer = await session.scalar(
+        select(Customer).where(Customer.email == email)
+    )
     if not customer:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
