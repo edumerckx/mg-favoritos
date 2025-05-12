@@ -58,22 +58,23 @@ task dev
 ## Como funciona
 
 Nas áreas logadas, o cliente só pode visualizar/editar/deletar os próprios dados.
-Abaixo relação de _endpoints_:
+
+### Endpoints:
 - Não é necessária autenticação
-  - **POST /customers/** 
-  - **POST /auth/token**  
+  - **POST /customers/** - cria cliente
+  - **POST /auth/token**  - login e geração de access-token
 - Necessitam autenticação - _access-token_
-  - **GET /customers/{id}**  
-  - **PUT /customers/{id}**  
-  - **DELETE /customers/{id}**
-  - **GET /favorites**  
-  - **POST /favorites**  
-  - **DELETE /favorites/{id}**  
-  - **POST /auth/refresh_token**  
+  - **GET /customers/{id}**  - recupera dados do cliente
+  - **PUT /customers/{id}**  - atualiza dados do cliente
+  - **DELETE /customers/{id}** - deleta cliente
+  - **GET /favorites**  - lista favoritos 
+  - **POST /favorites**  - adiciona favorito 
+  - **DELETE /favorites/{id}** - deleta favorito 
+  - **POST /auth/refresh_token**  - atualiza access-token
 
 
 
-### Checklist
+## Checklist
 - [x] API
 - [x] modelagem de dados (_mg_favoritos/models.py_)
 - [x] validação - schemas para request/response (_mg_favoritos/schemas/_) 
