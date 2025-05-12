@@ -36,7 +36,7 @@ extend-exclude = ['migrations']
 
 [tool.ruff.lint]
 preview = true
-select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+select = ['FAST', 'I', 'F', 'E', 'W', 'PL', 'PT']
 
 [tool.ruff.format]
 preview = true
@@ -45,6 +45,7 @@ quote-style = 'single'
 [tool.pytest.ini_options]
 pythonpath = '.'
 addopts = '-p no:warnings'
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.taskipy.tasks]
 lint = 'ruff check .; ruff check . --diff'

@@ -19,6 +19,7 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 
 Session = Annotated[SessionORM, Depends(get_session)]
 OAuth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 
 @router.post('/token', response_model=Token, status_code=HTTPStatus.CREATED)
@@ -42,7 +43,9 @@ def login_for_access_token(form_data: OAuth2Form, session: Session):
     return {'access_token': access_token, 'token_type': 'bearer'}
 
 
-@router.post('/refresh_token', response_model=Token, status_code=HTTPStatus.OK)
-def refresh_access_token(customer: Customer = Depends(get_customer)):
+@router.post(
+    '/refresh_token', response_model=Token, status_code=HTTPStatus.CREATED
+)
+def refresh_access_token(customer: CurrentCustomer):
     access_token = create_token(data={'sub': customer.email})
     return {'access_token': access_token, 'token_type': 'bearer'}

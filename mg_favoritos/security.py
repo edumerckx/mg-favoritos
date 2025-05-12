@@ -62,3 +62,10 @@ def get_customer(token: OAuth2Scheme, session: Session):
         )
 
     return customer
+
+
+def check_permissions(current_customer: Customer, customer_id: int):
+    if current_customer.id != customer_id:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+        )

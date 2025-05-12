@@ -4,12 +4,13 @@ from mg_favoritos.schemas.products import ProductResponse
 
 
 class FavoriteSchema(BaseModel):
-    customer_id: int
     product_id: int
 
 
-class FavoriteResponse(FavoriteSchema):
+class FavoriteResponse(BaseModel):
     id: int
+    customer_id: int
+    product_id: int
 
 
 class FavoriteList(BaseModel):
