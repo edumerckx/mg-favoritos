@@ -20,6 +20,11 @@ CurrentCustomer = Annotated[Customer, Depends(get_customer)]
     '/', status_code=HTTPStatus.CREATED, response_model=CustomerResponse
 )
 def create_customer(customer: CustomerSchema, session: Session):
+    """
+    Cria um novo cliente
+
+    - `customer`: CustomerSchema
+    """
     new_customer = Customer(
         name=customer.name,
         email=customer.email,
@@ -40,6 +45,13 @@ def create_customer(customer: CustomerSchema, session: Session):
 
 @router.get('/{id}', status_code=HTTPStatus.OK, response_model=CustomerResponse)
 def get_customer(id: int, current_customer: CurrentCustomer):
+    """
+    Busca um cliente pelo ID
+
+    Precisa estar logado
+
+    - `id`: int - id do cliente
+    """
     check_permissions(current_customer, id)
     return current_customer
 
@@ -51,6 +63,12 @@ def update_customer(
     session: Session,
     current_customer: CurrentCustomer,
 ):
+    """
+    Atualiza um cliente pelo ID
+
+    - `id`: int - id do cliente
+    - `customer`: CustomerSchema
+    """
     check_permissions(current_customer, id)
 
     try:
@@ -71,6 +89,10 @@ def update_customer(
 def delete_customer(
     id: int, session: Session, current_customer: CurrentCustomer
 ):
+    """
+    Deleta um cliente pelo ID
+
+    - `id`: int - id do cliente"""
     check_permissions(current_customer, id)
 
     session.delete(current_customer)

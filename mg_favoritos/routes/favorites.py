@@ -22,6 +22,9 @@ CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=FavoriteList)
 async def get_favorites(session: Session, current_customer: CurrentCustomer):
+    """
+    Busca os favoritos do usuário logado
+    """
     favorites = session.scalars(
         select(Favorite).where(Favorite.customer_id == current_customer.id)
     ).all()
@@ -44,6 +47,11 @@ async def create_favorite(
     session: Session,
     current_customer: CurrentCustomer,
 ):
+    """
+    Adiciona um favorito ao usuário logado
+
+    - `favorite`: FavoriteSchema
+    """
     db_favorite = session.scalar(
         select(Favorite).where(
             Favorite.customer_id == current_customer.id,
@@ -74,6 +82,11 @@ async def create_favorite(
 def delete_favorite(
     id: int, session: Session, current_customer: CurrentCustomer
 ):
+    """
+    Deleta um favorito pelo ID
+
+    - `id`: int - id do favorito
+    """
     db_favorite = session.scalar(
         select(Favorite).where(
             Favorite.customer_id == current_customer.id,

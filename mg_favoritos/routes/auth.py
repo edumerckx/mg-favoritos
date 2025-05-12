@@ -24,6 +24,12 @@ CurrentCustomer = Annotated[Customer, Depends(get_customer)]
 
 @router.post('/token', response_model=Token, status_code=HTTPStatus.CREATED)
 def login_for_access_token(form_data: OAuth2Form, session: Session):
+    """
+    Efetua o login do usuário e retorna um token de acesso para requests futuros
+
+    - `username`: email do usuário
+    - `password`: senha
+    """
     customer = session.scalar(
         select(Customer).where(Customer.email == form_data.username)
     )
@@ -47,5 +53,8 @@ def login_for_access_token(form_data: OAuth2Form, session: Session):
     '/refresh_token', response_model=Token, status_code=HTTPStatus.CREATED
 )
 def refresh_access_token(customer: CurrentCustomer):
+    """
+    Atualiza o token de acesso
+    """
     access_token = create_token(data={'sub': customer.email})
     return {'access_token': access_token, 'token_type': 'bearer'}
