@@ -55,6 +55,11 @@ alembic upgrade head
 task dev
 ```
 
+Para executar os testes:
+```sh
+task test
+```
+
 ## Como funciona
 
 Nas áreas logadas, o cliente só pode visualizar/editar/deletar os próprios dados.
