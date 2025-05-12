@@ -1,0 +1,30 @@
+services:
+  mg_favoritos_db:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_DB=favorites
+      - POSTGRES_PASSWORD=dBp4ss
+    ports:
+      - 5432:5432
+      
+  mg_favoritos_app:
+    image: mg_favoritos
+    entrypoint: ./entrypoint.sh
+    build: .
+    ports:
+      - 8000:8000
+    depends_on:
+      - mg_favoritos_db
+    environment:
+      - DATABASE_URL=postgresql+psycopg://user:dBp4ss@mg_favoritos_db/favorites
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - SECRET_KEY=compose-mgfavoritos
+      - ALGORITHM=HS256
+      - PRODUCTS_ENDPOINT=https://fakestoreapi.com/products
+
+volumes:
+  pgdata: 
+    

@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "mg_favoritos"}]
 
 [tool.poetry.dependencies]
-python = "3.12.5"
+python = "3.12.*"
 fastapi = {extras = ["standard"], version = "^0.115.12"}
 alembic = "^1.15.2"
 sqlalchemy = "^2.0.40"
